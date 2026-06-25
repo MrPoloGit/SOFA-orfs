@@ -1,0 +1,20 @@
+# ORFS run outputs (large, regeneratable)
+results/
+logs/
+objects/
+
+# Large generated RTL (regenerate from OpenFPGA)
+designs/*/src/*.v
+
+# Custom cell GDS files (large binary, reference from SOFA repo)
+custom_cells/*.gds
+
+# OS files
+.DS_Store
+*.swp
+*~
+plan.md
+
+# Python
+__pycache__/
+*.pyc
