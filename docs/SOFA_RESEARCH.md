@@ -13,7 +13,7 @@ All three SOFA variants share the same 12x12 CLB array topology:
 +-------+-------+-----+-------+
 | I/O   | CLB   | ... | I/O   |
 +-------+-------+-----+-------+
-| CLB   | CLB   | ... | CLB   |   ← 12 rows
+| CLB   | CLB   | ... | CLB   |   <- 12 rows
 |  ...  |  ...  | ... |  ...  |
 | CLB   | CLB   | ... | CLB   |
 +-------+-------+-----+-------+
