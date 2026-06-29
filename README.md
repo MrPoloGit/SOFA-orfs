@@ -31,6 +31,81 @@ How you install ORFS depends on your OS (see platform sections below).
 
 ---
 
+## Linux (x86_64)
+
+ORFS can be built natively on Ubuntu 20.04/22.04. Other distros work but
+require manual dependency resolution.
+
+### Requirements
+
+- Ubuntu 20.04 or 22.04 (x86_64)
+- 16 GB RAM minimum, 32 GB recommended
+- CMake ≥ 3.22
+- ~60 GB free disk space
+
+### Setup
+
+```bash
+# 1. Clone ORFS with submodules
+git clone --recursive \
+  https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts.git \
+  ~/OpenROAD-flow-scripts
+cd ~/OpenROAD-flow-scripts
+
+# 2. Install system dependencies
+sudo ./setup.sh
+
+# 3. Build OpenROAD and Yosys from source (20–60 min)
+./build_openroad.sh
+
+# 4. Add tools to PATH
+echo 'export ORFS_HOME=~/OpenROAD-flow-scripts' >> ~/.bashrc
+echo 'export FLOW_HOME=$ORFS_HOME/flow' >> ~/.bashrc
+echo 'export PATH=$ORFS_HOME/tools/install/OpenROAD/bin:$PATH' >> ~/.bashrc
+echo 'export PATH=$ORFS_HOME/tools/install/yosys/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# 5. Smoke test
+cd ~/OpenROAD-flow-scripts/flow
+make DESIGN_CONFIG=designs/nangate45/gcd/config.mk
+# Expect: results/nangate45/gcd/base/6_final.gds
+
+# 6. Clone OpenFPGA and SOFA
+git clone https://github.com/lnis-uofu/OpenFPGA.git ~/OpenFPGA
+git clone https://github.com/lnis-uofu/SOFA.git ~/SOFA
+
+# 7. Build OpenFPGA
+sudo apt-get install -y cmake build-essential python3 python3-pip \
+  libreadline-dev libffi-dev tcl-dev bison flex
+cd ~/OpenFPGA
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j$(nproc)
+
+export OPENFPGA_PATH=~/OpenFPGA
+echo 'export OPENFPGA_PATH=~/OpenFPGA' >> ~/.bashrc
+
+# 8. Generate SOFA HD RTL
+cd ~/SOFA/FPGA1212_SOFA_HD_PNR
+make runOpenFPGA
+
+# 9. Copy RTL and run
+cd /path/to/sofa-orfs
+RTL_SRC=~/SOFA/FPGA1212_SOFA_HD_PNR/FPGA1212_SOFA_HD_task/latest/vpr_arch/top/MIN_ROUTE_CHAN_WIDTH/SRC
+cp $RTL_SRC/*.v designs/sofa_hd/src/
+
+ln -sf $(pwd)/designs/sofa_hd \
+       ~/OpenROAD-flow-scripts/flow/designs/sofa_hd
+
+cd ~/OpenROAD-flow-scripts/flow
+make DESIGN_CONFIG=designs/sofa_hd/config.mk synth
+```
+
+**Tip for non-Ubuntu distros:** Read `~/OpenROAD-flow-scripts/setup.sh` and
+install equivalent packages for your package manager, then proceed from step 3.
+
+---
+
 ## macOS
 
 ORFS does not build natively on macOS. Use Docker.
@@ -124,81 +199,6 @@ ln -sf $(pwd)/designs/sofa_hd \
 cd ~/OpenROAD-flow-scripts/flow
 ../util/docker_shell make DESIGN_CONFIG=designs/sofa_hd/config.mk synth
 ```
-
----
-
-## Linux (x86_64)
-
-ORFS can be built natively on Ubuntu 20.04/22.04. Other distros work but
-require manual dependency resolution.
-
-### Requirements
-
-- Ubuntu 20.04 or 22.04 (x86_64)
-- 16 GB RAM minimum, 32 GB recommended
-- CMake ≥ 3.22
-- ~60 GB free disk space
-
-### Setup
-
-```bash
-# 1. Clone ORFS with submodules
-git clone --recursive \
-  https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts.git \
-  ~/OpenROAD-flow-scripts
-cd ~/OpenROAD-flow-scripts
-
-# 2. Install system dependencies
-sudo ./setup.sh
-
-# 3. Build OpenROAD and Yosys from source (20–60 min)
-./build_openroad.sh
-
-# 4. Add tools to PATH
-echo 'export ORFS_HOME=~/OpenROAD-flow-scripts' >> ~/.bashrc
-echo 'export FLOW_HOME=$ORFS_HOME/flow' >> ~/.bashrc
-echo 'export PATH=$ORFS_HOME/tools/install/OpenROAD/bin:$PATH' >> ~/.bashrc
-echo 'export PATH=$ORFS_HOME/tools/install/yosys/bin:$PATH' >> ~/.bashrc
-source ~/.bashrc
-
-# 5. Smoke test
-cd ~/OpenROAD-flow-scripts/flow
-make DESIGN_CONFIG=designs/nangate45/gcd/config.mk
-# Expect: results/nangate45/gcd/base/6_final.gds
-
-# 6. Clone OpenFPGA and SOFA
-git clone https://github.com/lnis-uofu/OpenFPGA.git ~/OpenFPGA
-git clone https://github.com/lnis-uofu/SOFA.git ~/SOFA
-
-# 7. Build OpenFPGA
-sudo apt-get install -y cmake build-essential python3 python3-pip \
-  libreadline-dev libffi-dev tcl-dev bison flex
-cd ~/OpenFPGA
-mkdir build && cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make -j$(nproc)
-
-export OPENFPGA_PATH=~/OpenFPGA
-echo 'export OPENFPGA_PATH=~/OpenFPGA' >> ~/.bashrc
-
-# 8. Generate SOFA HD RTL
-cd ~/SOFA/FPGA1212_SOFA_HD_PNR
-make runOpenFPGA
-
-# 9. Copy RTL and run
-cd /path/to/sofa-orfs
-RTL_SRC=~/SOFA/FPGA1212_SOFA_HD_PNR/FPGA1212_SOFA_HD_task/latest/vpr_arch/top/MIN_ROUTE_CHAN_WIDTH/SRC
-cp $RTL_SRC/*.v designs/sofa_hd/src/
-
-ln -sf $(pwd)/designs/sofa_hd \
-       ~/OpenROAD-flow-scripts/flow/designs/sofa_hd
-
-cd ~/OpenROAD-flow-scripts/flow
-make DESIGN_CONFIG=designs/sofa_hd/config.mk synth
-```
-
-**Tip for non-Ubuntu distros:** Read `~/OpenROAD-flow-scripts/setup.sh` and
-install equivalent packages for your package manager, then proceed from step 3.
 
 ---
 
