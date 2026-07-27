@@ -1,12 +1,14 @@
 export DESIGN_NAME   = fpga_top
 export PLATFORM      = sky130hd
 
-# RTL — generated from ~/SOFA/FPGA1212_QLSOFA_HD_PNR (Phase 2.9)
+# RTL - generated from ~/SOFA/FPGA1212_QLSOFA_HD_PNR (Phase 2.9)
 export VERILOG_FILES = $(wildcard $(DESIGN_DIR)/src/*.v)
 
-export SDC_FILE      = $(DESIGN_DIR)/constraint.sdc
+# SDC from the original SOFA tapeout — copied from the SOFA repo SRC/ dir
+# alongside the RTL (see plan.md Task 2.9)
+export SDC_FILE      = $(DESIGN_DIR)/src/fpga_top.sdc
 
-# Floorplan — 12x12 CLB grid, W=60, sky130hd
+# Floorplan - 12x12 CLB grid, W=60, sky130hd
 # W=60 is 50% more tracks than HD -> ~20% larger die estimate
 # Starting: ~5.3 mm^2 (2300x2300 µm)
 # See docs/SOFA_RESEARCH.md Section 6 for tuning guidance

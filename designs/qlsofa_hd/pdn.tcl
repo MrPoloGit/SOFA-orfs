@@ -1,5 +1,5 @@
 # PDN for QLSOFA HD on sky130hd
-# Larger die (~5.3 mm^2) — tighter stripe pitch for better IR drop
+# Larger die (~5.3 mm^2) - tighter stripe pitch for better IR drop
 
 add_global_connection -net VDD -pin_pattern {^VDD$} -power
 add_global_connection -net VSS -pin_pattern {^VSS$} -ground

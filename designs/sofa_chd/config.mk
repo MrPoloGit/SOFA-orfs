@@ -1,12 +1,14 @@
 export DESIGN_NAME   = fpga_top
 export PLATFORM      = sky130hd
 
-# RTL — generated from ~/SOFA/FPGA1212_SOFA_CHD_PNR (Phase 2.9)
+# RTL - generated from ~/SOFA/FPGA1212_SOFA_CHD_PNR (Phase 2.9)
 export VERILOG_FILES = $(wildcard $(DESIGN_DIR)/src/*.v)
 
-export SDC_FILE      = $(DESIGN_DIR)/constraint.sdc
+# SDC from the original SOFA tapeout — copied from the SOFA repo SRC/ dir
+# alongside the RTL (see plan.md Task 2.9)
+export SDC_FILE      = $(DESIGN_DIR)/src/fpga_top.sdc
 
-# Floorplan — 12x12 CLB grid, W=60 + CPL cells
+# Floorplan - 12x12 CLB grid, W=60 + CPL cells
 # CPL cells are slightly more compact than std mux -> 2100x2100 starting point
 # See docs/SOFA_RESEARCH.md Section 6 for tuning guidance
 export DIE_AREA      = 0 0 2100 2100

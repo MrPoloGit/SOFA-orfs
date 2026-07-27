@@ -1,19 +1,10 @@
-# SOFA HD timing constraints — 50 MHz prog_clk target
-# Reference: docs/SOFA_RESEARCH.md Section 5
-
-create_clock [get_ports prog_clk] \
-    -name prog_clk \
-    -period 20.0 \
-    -waveform {0 10}
-
-# Conservative I/O delays for a programmable fabric
-# (The fabric I/Os are connected to test harness, not performance-critical)
-set_input_delay  -clock prog_clk -max 2.0 [all_inputs]
-set_input_delay  -clock prog_clk -min 0.5 [all_inputs]
-set_output_delay -clock prog_clk -max 2.0 [all_outputs]
-set_output_delay -clock prog_clk -min 0.5 [all_outputs]
-
-# False path from/to SRAM configuration ports (static after programming)
-# Uncomment once the correct config port names are known from fpga_top.v:
-# set_false_path -from [get_ports ccff_head]
-# set_false_path -to   [get_ports ccff_tail]
+# THIS FILE IS NOT USED.
+#
+# config.mk points SDC_FILE at designs/sofa_hd/src/fpga_top.sdc —
+# the original SDC from the SOFA tapeout, copied from the SOFA repo:
+#
+#   cp ~/SOFA/FPGA1212_SOFA_HD_PNR/FPGA1212_SOFA_HD_task/latest/\
+#        vpr_arch/top/MIN_ROUTE_CHAN_WIDTH/SRC/fpga_top.sdc \
+#      designs/sofa_hd/src/
+#
+# See docs/Notes.md for why the original SDC is preferred over a custom one.

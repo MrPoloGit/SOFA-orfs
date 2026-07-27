@@ -5,6 +5,8 @@ objects/
 
 # Large generated RTL (regenerate from OpenFPGA)
 designs/*/src/*.v
+# SDC files in src/ are the original SOFA tapeout constraints — track them
+!designs/*/src/*.sdc
 
 # Custom cell GDS files (large binary, reference from SOFA repo)
 custom_cells/*.gds

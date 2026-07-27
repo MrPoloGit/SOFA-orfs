@@ -4,7 +4,7 @@
 # standard cells. This script adds met4/met5 power stripes for the large
 # (~3.6 mm^2) SOFA die.
 #
-# Adjust stripe pitch if DRC violations appear on met1 near power rings —
+# Adjust stripe pitch if DRC violations appear on met1 near power rings -
 # see docs/SOFA_RESEARCH.md Section 8.
 
 add_global_connection -net VDD -pin_pattern {^VDD$} -power

@@ -1,4 +1,4 @@
-# sofa-orfs — Results vs ICC2
+# sofa-orfs - Results vs ICC2
 
 ## SOFA HD
 

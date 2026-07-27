@@ -1,13 +1,10 @@
-# SOFA CHD timing constraints — 50 MHz prog_clk target
-# CPL cells provide ~27% delay improvement; timing should close more easily
-# than QLSOFA HD. See docs/SOFA_RESEARCH.md Section 4.
-
-create_clock [get_ports prog_clk] \
-    -name prog_clk \
-    -period 20.0 \
-    -waveform {0 10}
-
-set_input_delay  -clock prog_clk -max 2.0 [all_inputs]
-set_input_delay  -clock prog_clk -min 0.5 [all_inputs]
-set_output_delay -clock prog_clk -max 2.0 [all_outputs]
-set_output_delay -clock prog_clk -min 0.5 [all_outputs]
+# THIS FILE IS NOT USED.
+#
+# config.mk points SDC_FILE at designs/sofa_chd/src/fpga_top.sdc —
+# the original SDC from the SOFA tapeout, copied from the SOFA repo:
+#
+#   cp ~/SOFA/FPGA1212_SOFA_CHD_PNR/FPGA1212_SOFA_CHD_task/latest/\
+#        vpr_arch/top/MIN_ROUTE_CHAN_WIDTH/SRC/fpga_top.sdc \
+#      designs/sofa_chd/src/
+#
+# See docs/Notes.md for why the original SDC is preferred over a custom one.

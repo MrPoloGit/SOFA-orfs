@@ -23,9 +23,9 @@ reproduces all three variants using only open-source EDA tools.
 
 Before running any flow you need:
 
-1. **SOFA repo** — contains arch XMLs and CHD custom cells
-2. **OpenFPGA** — generates the Verilog RTL from the arch XMLs
-3. **OpenROAD Flow Scripts (ORFS)** — runs synthesis → place → route → GDS
+1. **SOFA repo** - contains arch XMLs and CHD custom cells
+2. **OpenFPGA** - generates the Verilog RTL from the arch XMLs
+3. **OpenROAD Flow Scripts (ORFS)** - runs synthesis -> place -> route -> GDS
 
 How you install ORFS depends on your OS (see platform sections below).
 
@@ -42,7 +42,7 @@ ORFS does not build natively on macOS. Use Docker.
 
 ### Resource configuration
 
-Open Docker Desktop → **Settings → Resources** and set:
+Open Docker Desktop -> **Settings -> Resources** and set:
 
 | Resource | Minimum | Recommended |
 |----------|---------|-------------|
@@ -51,15 +51,15 @@ Open Docker Desktop → **Settings → Resources** and set:
 | Disk     | 60 GB   | 100 GB      |
 
 On **Apple Silicon (M1/M2/M3)** also enable:  
-Settings → General → **"Use Rosetta for x86/amd64 emulation"**
+Settings -> General -> **"Use Rosetta for x86/amd64 emulation"**
 
 ### Setup
 
 ```bash
-# Apple Silicon only — install Rosetta if not already present
+# Apple Silicon only - install Rosetta if not already present
 softwareupdate --install-rosetta
 
-# 1. Pull ORFS Docker image (x86_64 — runs via Rosetta on Apple Silicon)
+# 1. Pull ORFS Docker image (x86_64 - runs via Rosetta on Apple Silicon)
 docker pull openroad/orfs:latest
 
 # Verify
@@ -115,7 +115,8 @@ docker run --rm --platform linux/amd64 \
 
 # 7. Copy RTL into sofa-orfs
 RTL_SRC=~/SOFA/FPGA1212_SOFA_HD_PNR/FPGA1212_SOFA_HD_task/latest/vpr_arch/top/MIN_ROUTE_CHAN_WIDTH/SRC
-cp $RTL_SRC/*.v designs/sofa_hd/src/
+cp $RTL_SRC/*.v   designs/sofa_hd/src/
+cp $RTL_SRC/*.sdc designs/sofa_hd/src/
 
 # 8. Link design into ORFS and run
 ln -sf $(pwd)/designs/sofa_hd \
@@ -129,12 +130,12 @@ cd ~/OpenROAD-flow-scripts/flow
 
 ## Linux (x86_64)
 
-ORFS can be built natively on Ubuntu 20.04/22.04. Other distros work but
-require manual dependency resolution.
+ORFS can be built natively on Ubuntu. Other distros work but require manual
+dependency resolution.
 
 ### Requirements
 
-- Ubuntu 20.04 or 22.04 (x86_64)
+- Ubuntu 22.04 or 24.04 (x86_64) - **24.04 recommended** (current LTS)
 - 16 GB RAM minimum, 32 GB recommended
 - CMake ≥ 3.22
 - ~60 GB free disk space
@@ -188,7 +189,8 @@ make runOpenFPGA
 # 9. Copy RTL and run
 cd /path/to/sofa-orfs
 RTL_SRC=~/SOFA/FPGA1212_SOFA_HD_PNR/FPGA1212_SOFA_HD_task/latest/vpr_arch/top/MIN_ROUTE_CHAN_WIDTH/SRC
-cp $RTL_SRC/*.v designs/sofa_hd/src/
+cp $RTL_SRC/*.v   designs/sofa_hd/src/
+cp $RTL_SRC/*.sdc designs/sofa_hd/src/
 
 ln -sf $(pwd)/designs/sofa_hd \
        ~/OpenROAD-flow-scripts/flow/designs/sofa_hd
@@ -211,10 +213,10 @@ follow the Linux instructions above inside the WSL environment.
 
 ```powershell
 # In an elevated PowerShell or Windows Terminal (Admin):
-wsl --install -d Ubuntu-22.04
+wsl --install -d Ubuntu-24.04
 ```
 
-Restart when prompted, then open **Ubuntu 22.04** from the Start menu and
+Restart when prompted, then open **Ubuntu 24.04** from the Start menu and
 complete the Linux setup steps above.
 
 ### Docker alternative
@@ -222,7 +224,7 @@ complete the Linux setup steps above.
 If you prefer Docker Desktop for Windows (WSL 2 backend):
 
 1. Install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-2. Enable **WSL 2 backend** in Settings → General
+2. Enable **WSL 2 backend** in Settings -> General
 3. Open an Ubuntu WSL terminal and follow the macOS Docker steps above
    (the commands are identical once inside WSL)
 

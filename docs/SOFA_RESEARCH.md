@@ -5,7 +5,7 @@ GitHub: https://github.com/lnis-uofu/SOFA
 
 ---
 
-## Section 1 — Fabric Overview
+## Section 1 - Fabric Overview
 
 All three SOFA variants share the same 12x12 CLB array topology:
 
@@ -33,7 +33,7 @@ Each CLB contains:
 
 ---
 
-## Section 2 — Variant Parameters
+## Section 2 - Variant Parameters
 
 ### SOFA HD
 
@@ -61,7 +61,7 @@ Each CLB contains:
 | Estimated cell count   | 6–12 M standard cell instances |
 | Placement density target | 40–50%                       |
 
-W=60 produces significantly more routing mux trees than W=40 —
+W=60 produces significantly more routing mux trees than W=40 -
 expect ~50% larger area and higher congestion.
 
 ### SOFA CHD
@@ -79,7 +79,7 @@ expect ~50% larger area and higher congestion.
 
 ---
 
-## Section 3 — CLB Tile Dimensions
+## Section 3 - CLB Tile Dimensions
 
 Estimated CLB tile size on sky130hd based on ICC2 results and cell density:
 
@@ -94,7 +94,7 @@ For hierarchical P&R (Phase 4.5), use a standalone tile die of approximately
 
 ---
 
-## Section 4 — CHD Custom CPL Cells
+## Section 4 - CHD Custom CPL Cells
 
 SOFA CHD replaces standard sky130hd mux2/mux3 cells in the routing fabric
 with custom Complementary Pass-transistor Logic (CPL) cells:
@@ -129,7 +129,7 @@ custom_cells/
 
 ---
 
-## Section 5 — Timing Reference (ICC2 Results)
+## Section 5 - Timing Reference (ICC2 Results)
 
 From the original SOFA ICC2 tape-out (MPW-1):
 
@@ -144,12 +144,12 @@ From the original SOFA ICC2 tape-out (MPW-1):
 **Target for ORFS run:** worst setup slack ≥ 0 ns at 50 MHz.
 
 If timing fails at 50 MHz, relax to 40 MHz (25 ns period) as a first step.
-The fabric is not speed-critical — it is a programmable device where
+The fabric is not speed-critical - it is a programmable device where
 the configuration path (prog_clk) is the limiting constraint.
 
 ---
 
-## Section 6 — Die Area Tuning Guidance
+## Section 6 - Die Area Tuning Guidance
 
 ORFS routing frequently fails for FPGA fabrics due to extreme routing
 density (every CLB output fans into many routing mux inputs).
@@ -161,7 +161,7 @@ density (every CLB output fans into many routing mux inputs).
 
 | Attempt | DIE_AREA           | PLACE_DENSITY | Expected result          |
 |---------|--------------------|---------------|--------------------------|
-| 1       | 0 0 1900 1900      | 0.40          | May fail — try first     |
+| 1       | 0 0 1900 1900      | 0.40          | May fail - try first     |
 | 2       | 0 0 2100 2100      | 0.40          | +10% area                |
 | 3       | 0 0 2100 2100      | 0.35          | Reduce density           |
 | 4       | 0 0 2400 2400      | 0.35          | +25% from attempt 1      |
@@ -184,22 +184,22 @@ If flat P&R fails after attempt 5, switch to hard-macro tile flow:
 1. P&R a single CLB tile standalone (160x160 µm target)
 2. Generate LEF abstraction and hand-written LIB
 3. Reassemble 144 tiles as macros with top-level P&R
-4. Top-level has only power/IO routing — trivially routable
+4. Top-level has only power/IO routing - trivially routable
 
 ---
 
-## Section 7 — RTL Characteristics
+## Section 7 - RTL Characteristics
 
 Generated RTL from OpenFPGA has characteristic patterns that affect synthesis:
 
 **File count:** 20–60 `.v` files per variant  
 **Total line count:** 50,000–200,000 lines for SOFA HD  
 **Key files:**
-- `fpga_top.v` — top-level module (clock ports, I/O)
-- `fpga_defines.v` — global parameters and macros
-- `sb_*.v` — switch box modules (routing mux heavy)
-- `cbx_*.v`, `cby_*.v` — connection box modules
-- `grid_*.v` — CLB tile modules
+- `fpga_top.v` - top-level module (clock ports, I/O)
+- `fpga_defines.v` - global parameters and macros
+- `sb_*.v` - switch box modules (routing mux heavy)
+- `cbx_*.v`, `cby_*.v` - connection box modules
+- `grid_*.v` - CLB tile modules
 
 **Common synthesis issues:**
 - Latches inferred from combinational RTL -> fix with `-nosdff` Yosys flag
@@ -213,13 +213,13 @@ grep -i "input.*clk\|clk.*input" designs/sofa_hd/src/fpga_top.v | head -5
 
 ---
 
-## Section 8 — DRC / LVS Notes
+## Section 8 - DRC / LVS Notes
 
 The original SOFA MPW-1 tape-out passed DRC/LVS with zero violations.
 Key checks for the ORFS run:
 
 - **met1 spacing:** ORFS PDN straps occasionally cause met1 DRC errors near
-  power rings — adjust stripe pitch in pdn.tcl if violations appear
+  power rings - adjust stripe pitch in pdn.tcl if violations appear
 - **Metal fill:** sky130hd KLayout scripts add automated fill; ensure
   `FILL_CELLS` is set or the default sky130hd fill is active
 - **Custom cells (CHD only):** Verify that invmux2/invmux3 LEF has correct
@@ -227,7 +227,7 @@ Key checks for the ORFS run:
 
 ---
 
-## Section 9 — Reference Links
+## Section 9 - Reference Links
 
 - SOFA repo: https://github.com/lnis-uofu/SOFA
 - OpenFPGA: https://github.com/lnis-uofu/OpenFPGA
