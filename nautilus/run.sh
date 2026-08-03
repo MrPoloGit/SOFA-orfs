@@ -48,6 +48,8 @@ BRANCH="$(git -C "$REPO_DIR" rev-parse --abbrev-ref HEAD 2>/dev/null || echo mai
 STAGE="final"
 SAVE_ARTIFACTS="false"
 REPO_URL="$(git -C "$REPO_DIR" remote get-url origin 2>/dev/null || echo '')"
+# Convert SSH URL to HTTPS so the init container can clone without SSH keys
+REPO_URL="${REPO_URL/git@github.com:/https://github.com/}"
 NAMESPACE="$(kubectl config view --minify -o jsonpath='{.contexts[0].context.namespace}' 2>/dev/null || echo '')"
 CLI_CPU=""
 CLI_MEM=""
@@ -229,6 +231,6 @@ done
 if [[ "$DRY_RUN" == false ]]; then
   echo ""
   echo "Monitor:"
-  echo "  ./k8s/run.sh --status"
+  echo "  ./nautilus/run.sh --status"
   echo "  kubectl logs -f job/$(job_name_for "${DESIGNS[0]}") -n $NAMESPACE -c build"
 fi
