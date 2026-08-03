@@ -83,7 +83,7 @@ expect ~50% larger area and higher congestion.
 
 Estimated CLB tile size on sky130hd based on ICC2 results and cell density:
 
-| Variant   | Tile width (µm) | Tile height (µm) | Tile area (mm²) |
+| Variant   | Tile width (µm) | Tile height (µm) | Tile area (mm^2) |
 |-----------|-----------------|------------------|-----------------|
 | SOFA HD   | ~130–160        | ~130–160         | ~0.017–0.026    |
 | QLSOFA HD | ~160–200        | ~160–200         | ~0.026–0.040    |
