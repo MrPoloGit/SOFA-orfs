@@ -4,10 +4,16 @@ logs/
 objects/
 
 # All RTL under designs/*/src/ is pre-committed generated output; track everything
-# except the two files with hardcoded absolute includes that can never be used as-is
+# except files that duplicate already-committed modules or are simulation-only
 designs/*/src/fabric_netlists.v
 designs/*/src/top_include_netlists.v
 designs/*/src/InstancesMap.txt
+designs/*/src/fpga_core.v
+designs/*/src/define_simulation.v
+designs/*/src/sub_module/digital_io_hd.v
+designs/*/src/sub_module/sky130_fd_sc_hd_wrapper.v
+designs/*/src/sub_module/*_post_synth.v
+designs/*/src/sub_module/fd_hd_mux_custom_cells_tt.v
 
 # Custom cell GDS files (large binary, reference from SOFA repo)
 custom_cells/*.gds
