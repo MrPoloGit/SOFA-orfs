@@ -18,7 +18,24 @@ spec:
           git clone --single-branch --branch __BRANCH__ --depth=1 \
             __REPO_URL__ /repo
           cd /repo
-          git submodule update --init --depth=1 bazel-orfs
+          git submodule update --init --depth=1 bazel-orfs sofa
+
+          # Copy RTL from sofa submodule into designs/*/src/
+          for design in sofa_hd qlsofa_hd sofa_chd; do
+            case $design in
+              sofa_hd)    SRC_BASE=sofa/FPGA1212_SOFA_HD_PNR/FPGA1212_SOFA_HD_Verilog ;;
+              qlsofa_hd)  SRC_BASE=sofa/FPGA1212_QLSOFA_HD_PNR/FPGA1212_QLSOFA_HD_Verilog ;;
+              sofa_chd)   SRC_BASE=sofa/FPGA1212_SOFA_CHD_PNR/FPGA1212_SOFA_CHD_Verilog ;;
+            esac
+            DEST=designs/$design/src
+            mkdir -p "$DEST"
+            rsync -a \
+              --exclude="fabric_netlists.v" \
+              --exclude="top_include_netlists.v" \
+              --exclude="sub_module/fpga_top.v" \
+              "$SRC_BASE/SRC/" "$DEST/"
+            cp "$SRC_BASE/SDC/disable_configure_ports.sdc" "$DEST/fpga_top.sdc"
+          done
         volumeMounts:
         - name: repo
           mountPath: /repo

@@ -7,7 +7,14 @@ load("@bazel-orfs//:openroad.bzl", "orfs_flow")
 orfs_flow(
     name = "sofa_chd",
     top = "fpga_top",
-    verilog_files = glob(["src/*.v"]),
+    verilog_files = glob(
+        ["src/**/*.v"],
+        exclude = [
+            "src/fabric_netlists.v",
+            "src/top_include_netlists.v",
+            "src/sub_module/fpga_top.v",  # Caravel SoC wrapper, conflicts with top
+        ],
+    ),
     pdk = "@orfs//flow:sky130hd",
     sources = {
         "SDC_FILE": ["src/fpga_top.sdc"],

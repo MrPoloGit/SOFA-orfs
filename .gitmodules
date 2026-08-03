@@ -1,3 +1,6 @@
 [submodule "bazel-orfs"]
 	path = bazel-orfs
 	url = https://github.com/The-OpenROAD-Project/bazel-orfs.git
+[submodule "sofa"]
+	path = sofa
+	url = https://github.com/lnis-uofu/SOFA.git

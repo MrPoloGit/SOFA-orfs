@@ -1,8 +1,10 @@
 export DESIGN_NAME   = fpga_top
 export PLATFORM      = sky130hd
 
-# RTL - generated from ~/SOFA/FPGA1212_SOFA_CHD_PNR (Phase 2.9)
-export VERILOG_FILES = $(wildcard $(DESIGN_DIR)/src/*.v)
+# RTL — copied from sofa/ submodule (see repo README)
+export VERILOG_FILES = $(filter-out \
+  %fabric_netlists.v %top_include_netlists.v %sub_module/fpga_top.v, \
+  $(shell find $(DESIGN_DIR)/src -name "*.v" 2>/dev/null))
 
 # SDC from the original SOFA tapeout — copied from the SOFA repo SRC/ dir
 # alongside the RTL (see plan.md Task 2.9)
