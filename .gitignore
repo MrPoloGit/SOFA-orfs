@@ -8,6 +8,8 @@ designs/*/src/*.v
 designs/*/src/**/*.v
 # SDC files are the original SOFA tapeout constraints — track them
 !designs/*/src/*.sdc
+# Routing Verilog is a generated asset that must be tracked (see designs/*/src/routing)
+!designs/*/src/routing/*.v
 # OpenFPGA instance map (generated metadata, not needed for synthesis)
 designs/*/src/InstancesMap.txt
 

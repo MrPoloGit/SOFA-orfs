@@ -35,7 +35,8 @@ spec:
             esac
             DEST=designs/$design/src
             mkdir -p "$DEST"
-            cp -r "$SRC_BASE/SRC/." "$DEST/"
+            find "$SRC_BASE/SRC" -mindepth 1 -maxdepth 1 ! -name "routing" -exec cp -r {} "$DEST/" \;
+            cp "$SRC_BASE/SRC/"*.v "$DEST/" 2>/dev/null || true
             rm -f "$DEST/fabric_netlists.v" \
                   "$DEST/top_include_netlists.v" \
                   "$DEST/sub_module/fpga_top.v"
