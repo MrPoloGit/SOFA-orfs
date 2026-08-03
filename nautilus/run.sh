@@ -199,6 +199,9 @@ for design in "${DESIGNS[@]}"; do
     -e "s|__REPO_URL__|${REPO_URL}|g" \
     -e "s|__BAZEL_TARGET__|${bazel_target}|g" \
     -e "s|__SAVE_ARTIFACTS__|${SAVE_ARTIFACTS}|g" \
+    -e "s|__USER_LABEL__|${USER_LABEL}|g" \
+    -e "s|__DESIGN_LABEL__|${design_label}|g" \
+    -e "s|__STAGE__|${STAGE}|g" \
     -e "s|__CPU_REQUEST__|${cpu_req}|g" \
     -e "s|__CPU_LIMIT__|${cpu_lim}|g" \
     -e "s|__MEM_REQUEST__|${mem_req}|g" \
@@ -206,10 +209,6 @@ for design in "${DESIGNS[@]}"; do
     -e "s|__EPH_REQUEST__|${eph_req}|g" \
     -e "s|__EPH_LIMIT__|${eph_lim}|g" \
     "$TEMPLATE")
-
-  # Inject pod labels for filtering
-  yaml=$(echo "$yaml" | sed \
-    '/^      initContainers:$/i\      labels:\n        app: sofa-orfs\n        user: '"$USER_LABEL"'\n        design: '"$design_label"'\n        stage: '"$STAGE"'')
 
   if [[ "$DRY_RUN" == true ]]; then
     echo "--- # $design / $STAGE"

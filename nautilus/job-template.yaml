@@ -7,6 +7,12 @@ spec:
   ttlSecondsAfterFinished: 3600
   backoffLimit: 0
   template:
+    metadata:
+      labels:
+        app: sofa-orfs
+        user: __USER_LABEL__
+        design: __DESIGN_LABEL__
+        stage: __STAGE__
     spec:
       initContainers:
       - name: clone-repo
