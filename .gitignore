@@ -3,14 +3,10 @@ results/
 logs/
 objects/
 
-# Generated RTL — sourced from sofa/ submodule at build time
-designs/*/src/*.v
-designs/*/src/**/*.v
-# SDC files are the original SOFA tapeout constraints — track them
-!designs/*/src/*.sdc
-# Routing Verilog is a generated asset that must be tracked (see designs/*/src/routing)
-!designs/*/src/routing/*.v
-# OpenFPGA instance map (generated metadata, not needed for synthesis)
+# All RTL under designs/*/src/ is pre-committed generated output; track everything
+# except the two files with hardcoded absolute includes that can never be used as-is
+designs/*/src/fabric_netlists.v
+designs/*/src/top_include_netlists.v
 designs/*/src/InstancesMap.txt
 
 # Custom cell GDS files (large binary, reference from SOFA repo)
