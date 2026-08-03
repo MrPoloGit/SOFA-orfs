@@ -1,0 +1,30 @@
+load("@bazel-orfs//:openroad.bzl", "orfs_flow")
+
+# SOFA CHD — 12×12 CLB, W=60, CPL custom cells (invmux2_1, invmux3_1).
+# RTL (src/*.v) and SDC (src/fpga_top.sdc) are committed to the repo.
+# Custom cells (//custom_cells:*) must be present before building.
+# See docs/SOFA_RESEARCH.md Section 5 and plan.md Phase 5.
+orfs_flow(
+    name = "sofa_chd",
+    top = "fpga_top",
+    verilog_files = glob(["src/*.v"]),
+    pdk = "@orfs//flow:sky130hd",
+    sources = {
+        "SDC_FILE": ["src/fpga_top.sdc"],
+        "FASTROUTE_TCL": ["fastroute.tcl"],
+        "PDN_TCL": ["pdn.tcl"],
+        "ADDITIONAL_LEFS": ["//custom_cells:lefs"],
+        "ADDITIONAL_LIBS": ["//custom_cells:libs"],
+        "SYNTH_CELL_MODELS": ["//custom_cells:models"],
+    },
+    arguments = {
+        "DIE_AREA": "0 0 2100 2100",
+        "CORE_AREA": "10 10 2090 2090",
+        "PLACE_DENSITY": "0.40",
+        "CLOCK_PORT": "prog_clk",
+        "CLOCK_PERIOD": "20.0",
+        "MIN_ROUTING_LAYER": "met1",
+        "MAX_ROUTING_LAYER": "met5",
+        "SYNTH_ARGS": "-nosdff",
+    },
+)

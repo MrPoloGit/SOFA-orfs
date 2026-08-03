@@ -11,6 +11,12 @@ designs/*/src/*.v
 # Custom cell GDS files (large binary, reference from SOFA repo)
 custom_cells/*.gds
 
+# Bazel
+bazel-*
+!bazel-orfs
+MODULE.bazel.lock
+.bazelrc.user
+
 # OS files
 .DS_Store
 *.swp

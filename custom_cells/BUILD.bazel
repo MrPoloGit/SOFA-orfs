@@ -1,0 +1,22 @@
+# CPL custom cells for SOFA CHD (sky130_uuopenfpga_cc_hd_invmux2_1 / invmux3_1).
+# These files are not yet present (Phase 5).  Add them to this directory
+# alongside their corresponding LEF, LIB, and behavioral Verilog files.
+# See docs/SOFA_RESEARCH.md Section 5 for cell specifications.
+
+filegroup(
+    name = "lefs",
+    srcs = glob(["*.lef"]),
+    visibility = ["//designs/sofa_chd:__pkg__"],
+)
+
+filegroup(
+    name = "libs",
+    srcs = glob(["*.lib"]),
+    visibility = ["//designs/sofa_chd:__pkg__"],
+)
+
+filegroup(
+    name = "models",
+    srcs = glob(["*.v"]),
+    visibility = ["//designs/sofa_chd:__pkg__"],
+)

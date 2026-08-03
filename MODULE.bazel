@@ -1,0 +1,142 @@
+"""SOFA-orfs — SOFA eFPGA re-implementation using OpenROAD Flow Scripts.
+
+bazel-orfs lives at ./bazel-orfs as a git submodule (pinned at 6c1bbca,
+same as HighTide).  ORFS and OpenROAD SHAs also match HighTide's pins so
+that remote-cache hits are shareable between the two projects.
+
+Override declarations are root-only in bzlmod, so we re-declare all of
+bazel-orfs/MODULE.bazel's non-BCR overrides here.  Keep these in sync
+whenever the bazel-orfs submodule is bumped.
+"""
+
+module(
+    name = "sofa-orfs",
+    version = "0.0.1",
+)
+
+# --- bazel-orfs pinned via submodule ---
+bazel_dep(name = "bazel-orfs")
+local_path_override(
+    module_name = "bazel-orfs",
+    path = "bazel-orfs",
+)
+
+bazel_dep(name = "bazel-orfs-verilog")
+local_path_override(
+    module_name = "bazel-orfs-verilog",
+    path = "bazel-orfs/verilog",
+)
+
+# --- Non-BCR deps required by bazel-orfs ---
+# Pins mirror bazel-orfs/MODULE.bazel at submodule commit 6c1bbca.
+
+bazel_dep(name = "abc", version = "0.64-yosyshq.bcr.1")
+bazel_dep(name = "yosys", version = "0.64")
+
+bazel_dep(name = "orfs")
+archive_override(
+    module_name = "orfs",
+    integrity = "sha256-kzOoZooVzsWKOVKIOQszWV8EJCGV8tBzUl0DBIBVaWc=",
+    patch_strip = 1,
+    patches = [
+        "//patches:0036-fix-bazel-orfs-bazel_dep-non-dev-for-load-visibility.patch",
+    ],
+    strip_prefix = "OpenROAD-flow-scripts-fb65d5b487d2afd443fc1892330f622c776a57ac",
+    urls = ["https://github.com/The-OpenROAD-Project/OpenROAD-flow-scripts/archive/fb65d5b487d2afd443fc1892330f622c776a57ac.tar.gz"],
+)
+
+bazel_dep(name = "openroad")
+archive_override(
+    module_name = "openroad",
+    integrity = "sha256-011veekekQGPjuDtDyxBsYmW7JkC6T2PqNhlCK7hCDk=",
+    # GitHub /archive/<sha>.tar.gz tarballs don't carry submodules; vendor
+    # src/sta (OpenSTA) and third-party/abc from their own archives.
+    patch_cmds = [
+        "curl -sSfL --retry 5 --retry-all-errors --retry-delay 5 -o sta.tar.gz https://github.com/The-OpenROAD-Project/OpenSTA/archive/8572175ac45c42ce8d3d772f73bbb059786b9c66.tar.gz && echo '805fbf8fef8ff35bc03e1d7fc3eb15760f886a4735e9c96adec303904b5d7d3e  sta.tar.gz' | sha256sum -c - && tar xzf sta.tar.gz --strip-components=1 -C src/sta && rm sta.tar.gz",
+        "curl -sSfL --retry 5 --retry-all-errors --retry-delay 5 -o abc.tar.gz https://github.com/The-OpenROAD-Project/abc/archive/d527cfab4ad731b767ea0a2be2021d920d3afece.tar.gz && echo '0cbf538e60d0303d0e00360d8973aaad7dae198954bed6e34cc31c9a13b3f802  abc.tar.gz' | sha256sum -c - && tar xzf abc.tar.gz --strip-components=1 -C third-party/abc && rm abc.tar.gz",
+    ],
+    strip_prefix = "OpenROAD-b65c274cadefe2151aa7eee32e1be9026e8ff14a",
+    urls = ["https://github.com/The-OpenROAD-Project/OpenROAD/archive/b65c274cadefe2151aa7eee32e1be9026e8ff14a.tar.gz"],
+)
+
+# --- Version overrides required by openroad's transitive dep tree ---
+# Root-only: non-root modules cannot apply these.
+
+# sv-lang 10.0.bcr.2 not yet in BCR; force the fork-registry version.
+single_version_override(
+    module_name = "sv-lang",
+    version = "10.0.1-20260316-f04e8156",
+)
+
+# sv-lang pulls boost.unordered@1.87.0; openroad wants 1.89.0.bcr.2.
+single_version_override(
+    module_name = "boost.unordered",
+    version = "1.89.0.bcr.2",
+)
+
+# scip 9.2.3 tinycthread collides with glibc 2.41+ <threads.h>.
+single_version_override(
+    module_name = "scip",
+    version = "9.2.3.bcr.1",
+)
+
+# sed-4.9 lib/memchr.c fails to compile on glibc 2.41+.
+single_version_override(
+    module_name = "sed",
+    patch_cmds = [
+        "sed -i 's|^#ifdef _LIBC$|#if 1|' lib/memchr.c",
+    ],
+    version = "4.9.bcr.5",
+)
+
+# or-tools→soplex: force version rebuilt against boost 1.89.
+single_version_override(
+    module_name = "soplex",
+    version = "7.1.4.bcr.3",
+)
+
+bazel_dep(name = "glpk", version = "5.0.bcr.4")
+
+# rules_pycross: configure Python environments (pulled by sv-lang).
+bazel_dep(name = "rules_pycross", version = "0.8.1")
+
+pycross = use_extension("@rules_pycross//pycross/extensions:pycross.bzl", "pycross")
+pycross.configure_environments(python_versions = ["3.13"])
+
+# Qt prebuilts for OpenROAD GUI (required by openroad's build graph even
+# when run headlessly; the GUI binary isn't invoked on k8s).
+bazel_dep(name = "qt-bazel")
+git_override(
+    module_name = "qt-bazel",
+    commit = "886104974c2fd72439f2c33b5deebf0fe4649df7",
+    remote = "https://github.com/The-OpenROAD-Project/qt_bazel_prebuilts",
+)
+
+# --- LLVM toolchain (OpenROAD requires C++20 / libc++) ---
+bazel_dep(name = "toolchains_llvm", version = "1.5.0")
+
+llvm = use_extension(
+    "@toolchains_llvm//toolchain/extensions:llvm.bzl",
+    "llvm",
+)
+llvm.toolchain(
+    llvm_version = "20.1.8",
+)
+use_repo(llvm, "llvm_toolchain")
+
+register_toolchains(
+    "@llvm_toolchain//:all",
+)
+
+# --- Python 3.13 toolchain (for ORFS flow scripts) ---
+bazel_dep(name = "rules_python", version = "1.9.0")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.13",
+)
+
+# --- ORFS extension: fetch PDK + standard cells ---
+orfs = use_extension("@bazel-orfs//:extension.bzl", "orfs_repositories")
+orfs.default()
