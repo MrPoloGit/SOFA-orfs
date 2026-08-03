@@ -21,8 +21,8 @@ orfs_flow(
         "PDN_TCL": ["pdn.tcl"],
     },
     arguments = {
-        "DIE_AREA": "0 0 1900 1900",
-        "CORE_AREA": "10 10 1890 1890",
+        "DIE_AREA": "0 0 2800 2800",
+        "CORE_AREA": "10 10 2790 2790",
         "PLACE_DENSITY": "0.40",
         "MIN_ROUTING_LAYER": "met1",
         "MAX_ROUTING_LAYER": "met5",
