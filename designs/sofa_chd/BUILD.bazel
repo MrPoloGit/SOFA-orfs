@@ -30,6 +30,5 @@ orfs_flow(
         "PLACE_DENSITY": "0.40",
         "MIN_ROUTING_LAYER": "met1",
         "MAX_ROUTING_LAYER": "met5",
-        "SYNTH_ARGS": "-nosdff",
     },
 )
