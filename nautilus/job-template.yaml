@@ -35,11 +35,10 @@ spec:
             esac
             DEST=designs/$design/src
             mkdir -p "$DEST"
-            rsync -a \
-              --exclude="fabric_netlists.v" \
-              --exclude="top_include_netlists.v" \
-              --exclude="sub_module/fpga_top.v" \
-              "$SRC_BASE/SRC/" "$DEST/"
+            cp -r "$SRC_BASE/SRC/." "$DEST/"
+            rm -f "$DEST/fabric_netlists.v" \
+                  "$DEST/top_include_netlists.v" \
+                  "$DEST/sub_module/fpga_top.v"
             cp "$SRC_BASE/SDC/disable_configure_ports.sdc" "$DEST/fpga_top.sdc"
           done
         volumeMounts:
