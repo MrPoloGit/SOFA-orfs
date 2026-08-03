@@ -10,7 +10,6 @@ designs/*/src/top_include_netlists.v
 designs/*/src/InstancesMap.txt
 designs/*/src/fpga_core.v
 designs/*/src/define_simulation.v
-designs/*/src/sub_module/digital_io_hd.v
 designs/*/src/sub_module/sky130_fd_sc_hd_wrapper.v
 designs/*/src/sub_module/*_post_synth.v
 designs/*/src/sub_module/fd_hd_mux_custom_cells_tt.v
