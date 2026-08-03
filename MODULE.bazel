@@ -30,7 +30,7 @@ local_path_override(
 # --- Non-BCR deps required by bazel-orfs ---
 # Pins mirror bazel-orfs/MODULE.bazel at submodule commit 6c1bbca.
 
-bazel_dep(name = "abc", version = "0.64-yosyshq.bcr.1")
+bazel_dep(name = "abc", version = "0.64-yosyshq.bcr.2")
 bazel_dep(name = "yosys", version = "0.64")
 
 bazel_dep(name = "orfs")
@@ -95,7 +95,7 @@ single_version_override(
     version = "7.1.4.bcr.3",
 )
 
-bazel_dep(name = "glpk", version = "5.0.bcr.4")
+bazel_dep(name = "glpk", version = "5.0.bcr.5")
 
 # rules_pycross: configure Python environments (pulled by sv-lang).
 bazel_dep(name = "rules_pycross", version = "0.8.1")

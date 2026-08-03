@@ -1,3 +1,5 @@
+create_clock -period 20.0 [get_ports prog_clk]
+
 #############################################
 #	Synopsys Design Constraints (SDC)
 #	For FPGA fabric 
