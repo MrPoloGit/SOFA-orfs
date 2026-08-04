@@ -163,12 +163,13 @@ Per-design CPU/memory/storage requests are in `nautilus/design_resources.conf`.
 
 | Variant | CPU req | Memory req | Memory limit | Ephemeral |
 |---------|---------|------------|--------------|-----------|
-| sofa_hd | 16 | 64 Gi | 128 Gi | 100–200 Gi |
-| qlsofa_hd | 16 | 96 Gi | 192 Gi | 150–250 Gi |
-| sofa_chd | 16 | 96 Gi | 192 Gi | 150–250 Gi |
+| sofa_hd | 16 | 160 Gi | 192 Gi | 100–120 Gi |
+| qlsofa_hd | 16 | 160 Gi | 192 Gi | 150–180 Gi |
+| sofa_chd | 16 | 160 Gi | 192 Gi | 150–180 Gi |
 
+All limits are 1.2× the request (Nautilus policy maximum).
 If a job exits code 137 (OOMKilled), bump `mem_req`/`mem_lim` in
-`design_resources.conf` or pass `--mem 128Gi` on the command line.
+`design_resources.conf` and resubmit.
 
 ---
 

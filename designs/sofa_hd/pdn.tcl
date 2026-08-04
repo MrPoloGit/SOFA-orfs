@@ -1,11 +1,12 @@
 # PDN for SOFA HD on sky130hd
 #
-# The sky130hd ORFS platform already inserts VDD/VSS rails on met1 for
-# standard cells. This script adds met4/met5 power stripes for the large
-# (~3.6 mm^2) SOFA die.
+# Matches the sky130hd platform default pattern:
+#   met1  follow-pins (standard cell VDD/VSS rails)
+#   met4  vertical stripes, 0.48 um wide, 56 um pitch
+#   met5  horizontal stripes, 1.6 um wide, 56 um pitch
 #
-# Adjust stripe pitch if DRC violations appear on met1 near power rings -
-# see docs/SOFA_RESEARCH.md Section 8.
+# The ring and non-standard stripe widths in the earlier version were
+# removed to avoid PDN tool memory explosions on the flat FPGA netlist.
 
 add_global_connection -net VDD -pin_pattern {^VDD$} -power
 add_global_connection -net VSS -pin_pattern {^VSS$} -ground
@@ -14,15 +15,14 @@ set_voltage_domain -power VDD -ground VSS
 
 define_pdn_grid -name "Core" -voltage_domains "Core"
 
-# Power ring around the core on met4/met5
-add_pdn_ring \
+# met1 — standard cell VDD/VSS rails (follow standard cell pin pitch)
+add_pdn_stripe \
     -grid "Core" \
-    -layers {met4 met5} \
-    -widths {1.6 1.6} \
-    -spacings {1.6 1.6} \
-    -core_offsets {2 2}
+    -layer met1 \
+    -width 0.48 \
+    -followpins
 
-# met4 vertical stripes (pitch 56 µm ≈ one stripe per ~14 CLBs wide)
+# met4 vertical power stripes
 add_pdn_stripe \
     -grid "Core" \
     -layer met4 \
@@ -30,7 +30,7 @@ add_pdn_stripe \
     -pitch 56.0 \
     -offset 2.0
 
-# met5 horizontal stripes
+# met5 horizontal power stripes
 add_pdn_stripe \
     -grid "Core" \
     -layer met5 \
@@ -38,4 +38,6 @@ add_pdn_stripe \
     -pitch 56.0 \
     -offset 2.0
 
+# Connect all layers
+add_pdn_connect -grid "Core" -layers {met1 met4}
 add_pdn_connect -grid "Core" -layers {met4 met5}
