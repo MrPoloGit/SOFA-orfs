@@ -25,6 +25,13 @@ spec:
             __REPO_URL__ /repo
           cd /repo
           git submodule update --init --depth=1 bazel-orfs
+        resources:
+          requests:
+            cpu: "1"
+            memory: "512Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
         volumeMounts:
         - name: repo
           mountPath: /repo
