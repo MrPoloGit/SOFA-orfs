@@ -65,9 +65,40 @@ spec:
           echo "  memory : $(free -h | awk '/Mem/{print $2}')"
           echo "========================="
 
+          echo "=== disk before build ==="
+          df -h /
+          echo "========================="
+
           BUILD_RC=0
-          bazel build --disk_cache=~/.cache/bazel-disk-cache __BAZEL_TARGET__ \
+          bazel build \
+            --disk_cache=~/.cache/bazel-disk-cache \
+            --verbose_failures \
+            __BAZEL_TARGET__ \
             || BUILD_RC=$?
+
+          echo "=== disk after build (rc=$BUILD_RC) ==="
+          df -h /
+          echo "======================================="
+
+          # On failure, save any ORFS log files Bazel already wrote to disk.
+          if [ $BUILD_RC -ne 0 ]; then
+            echo "Build failed — searching for partial ORFS logs..."
+            LOG_DEST="/artifacts/designs/__DESIGN_LABEL__/logs_partial"
+            mkdir -p "$LOG_DEST"
+            find /root/.cache/bazel \
+              -name "*.log" \
+              -path "*fpga_top*" \
+              2>/dev/null \
+              | while read f; do
+                  cp "$f" "$LOG_DEST/" 2>/dev/null && echo "Saved: $f"
+                done || true
+            find bazel-out \
+              -name "*.log" \
+              2>/dev/null \
+              | while read f; do
+                  cp "$f" "$LOG_DEST/" 2>/dev/null && echo "Saved: $f"
+                done || true
+          fi
 
           if [ "__SAVE_ARTIFACTS__" = "true" ]; then
             TARGET="__BAZEL_TARGET__"

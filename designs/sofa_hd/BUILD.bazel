@@ -18,7 +18,8 @@ orfs_flow(
     sources = {
         "SDC_FILE": ["src/fpga_top.sdc"],
         "FASTROUTE_TCL": ["fastroute.tcl"],
-        "PDN_TCL": ["pdn.tcl"],
+        # PDN_TCL omitted — use sky130hd platform default.
+        # Our custom pdn.tcl was crashing OpenROAD's PDN tool.
     },
     arguments = {
         "DIE_AREA": "0 0 2800 2800",
