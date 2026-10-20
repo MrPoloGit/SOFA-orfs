@@ -217,6 +217,21 @@ git_override(
     remote = "https://github.com/The-OpenROAD-Project/qt_bazel_prebuilts",
 )
 
+# --- The slang yosys frontend plugin: ORFS's synth flow loads it
+# unconditionally via YOSYS_PLUGIN_PATH (SYNTH_HDL_FRONTEND=slang is this
+# bazel-orfs pin's default, not just an opt-in for .sv sources) -- without
+# this, synth fails even on a plain-Verilog design with "Can't load module
+# `./slang'" because yosys falls back to its own share/plugins dir, which
+# doesn't carry it. Non-dev in bazel-orfs's own MODULE.bazel specifically so
+# downstream roots keep the repo visible; kept here for the same reason.
+bazel_dep(name = "sv-elab", version = "2026-07-07")
+
+single_version_override(
+    module_name = "sv-elab",
+    patch_strip = 1,
+    patches = ["//patches:sv-elab-0001-redefinition-shares-wire.patch"],
+)
+
 # --- ORFS: fetched by bazel-orfs's own extension (not a separate bzlmod
 # module), pinned to the commit/integrity bazel-orfs itself builds with.
 orfs = use_extension("@bazel-orfs//:extension.bzl", "orfs_repositories")
@@ -224,7 +239,9 @@ orfs.source(
     commit = "9c431405a71909ca9aa5b9000d3d11fa36b2a32a",
     integrity = "sha256-GJSbuVFixHzrafRTF+9jxpBYmTy3/z52nESiaCGke2s=",
 )
-orfs.default()
+orfs.default(
+    yosys_plugins = ["@sv-elab//src/yosys_plugin:slang.so"],
+)
 use_repo(orfs, "orfs")
 
 # --- Hermetic LLVM toolchain: OpenROAD builds against the BCR "llvm"
