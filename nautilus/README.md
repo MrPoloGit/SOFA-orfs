@@ -6,7 +6,49 @@ cluster. Each SOFA variant (sofa_hd, qlsofa_hd, sofa_chd) submits as a
 separate Job using `ubuntu:24.04` + Bazelisk to build via
 [bazel-orfs](https://github.com/The-OpenROAD-Project/bazel-orfs).
 
-Namespace: **ucsc-hsc** · PVC: **sofa-orfs-artifacts**
+Namespace: **ucsc-hsc** · PVCs: **sofa-orfs-artifacts**, **sofa-orfs-bazel-cache**
+
+---
+
+## Status (2026-10-15): bazel-orfs bump to upstream main, pending a real Nautilus run
+
+`bazel-orfs` was bumped from `6c1bbca` (764 commits behind) to upstream
+`main` at `03b10a1d` — not the GT2N fork other sofa-orfs-adjacent projects
+pin. Along with it: `MODULE.bazel` was rewritten to match bazel-orfs's
+current `docs/openroad.md` root-override recipe (ORFS now fetches via
+`orfs.source()` instead of a root `archive_override`; the hermetic LLVM
+toolchain now needs an explicit root `bazel_dep(llvm) + register_toolchains`;
+several overrides the old pin needed — `boost.unordered`, `soplex`, `glpk`,
+`freetype` — are gone, replaced by a few new ones bazel-orfs's recipe adds),
+`.bazelversion` went 8.5.0 → 9.3.0 (bazel-orfs now requires Bazel ≥9.1.1),
+and all referenced patch files were copied over from bazel-orfs/patches.
+This same work also added the `sofa-orfs-bazel-cache` PVC above.
+
+**Validated locally:** `bazel mod graph` resolves with no errors, and
+`bazel build //designs/sofa_hd:sofa_hd_synth` analyzes all three designs
+(no `--nobuild`) and gets deep into real compilation of OpenROAD/ODB/
+slang/or-tools from source under the hermetic LLVM toolchain — thousands
+of actions in, no errors traceable to the bump itself.
+
+**Not validated locally, by design:** a full build cannot complete on
+macOS — `tcmalloc` (pulled in transitively by OpenROAD's or-tools
+dependency) hard-errors with `"TCMalloc is only supported on Linux"`.
+This is an upstream platform constraint, not something this bump can work
+around, and it doesn't affect Nautilus (`ubuntu:24.04`, linux/amd64 — see
+the `bazelisk-linux-amd64` download in `job-template.yaml`). The real
+validation of this bump is therefore the **first Nautilus job run against
+it** — treat the next `./nautilus/run.sh` invocation as doing double duty:
+confirming the bump and warming the new `sofa-orfs-bazel-cache` PVC for
+every run after it. The PVCs above must exist before that first run.
+
+**Known pre-existing state, unrelated to this bump:** the `bazel-orfs`
+submodule's own working tree had uncommitted edits before this bump
+started (cosmetic Unicode→ASCII cleanups across several files, plus an
+updated `qt-bazel-xcb-cursor-from-source.patch`) that predate this
+session. They were stashed (`git -C bazel-orfs stash list`) rather than
+discarded or carried forward — recover with
+`git -C bazel-orfs stash pop` if they're wanted, after reviewing what
+they are.
 
 ---
 
@@ -21,7 +63,7 @@ export KUBECONFIG=~/.kube/nautilus-config
 kubectl get pods -n ucsc-hsc   # verify access
 ```
 
-### 2. PVC (one-time setup)
+### 2. PVCs (one-time setup)
 
 ```bash
 kubectl apply -n ucsc-hsc -f - <<'EOF'
@@ -35,8 +77,27 @@ spec:
     requests:
       storage: 200Gi
   storageClassName: rook-cephfs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sofa-orfs-bazel-cache
+spec:
+  accessModes: [ReadWriteMany]
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: rook-cephfs
 EOF
 ```
+
+`sofa-orfs-bazel-cache` backs `--disk_cache`/`--repository_cache` (mounted
+at `/root/.cache/bazel-persist`) so repeated jobs — a rerun after a failure,
+or a later stage on a fresh pod — reuse OpenROAD/Yosys/LLVM toolchain
+artifacts from prior jobs instead of rebuilding them from scratch. Shared
+`ReadWriteMany` is safe here: Bazel's disk cache is content-addressed and
+built for concurrent access, so the three designs' jobs can mount it at
+once.
 
 ---
 
@@ -143,7 +204,12 @@ kubectl cp -n ucsc-hsc viewer:/a/designs/sofa_hd/logs/sky130hd/fpga_top/base/5_1
 ## Stage reference
 
 Each stage is a Bazel target suffix. Run `--stage <stage>` to stop after that point.
-Rerunning a later stage on a fresh pod re-runs all prior stages (no cross-pod cache).
+With the `sofa-orfs-bazel-cache` PVC mounted, a later stage on a fresh pod
+gets cache hits (from `--disk_cache`) for any prior action it reruns with
+identical inputs — the OpenROAD/Yosys/LLVM toolchain build in particular,
+which only has to happen once across all jobs that share the PVC, not once
+per pod. Stage actions specific to that run (synthesis, placement, routing
+on this design's actual inputs) still execute normally.
 
 | Stage | Bazel target | Notes | Typical wall time |
 |-------|-------------|-------|-------------------|
